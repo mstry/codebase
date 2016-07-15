@@ -12,44 +12,45 @@
  */
 static int __fs_path_strip(char *path)
 {
-	int i, j, flag;
+	int i, j, k, flag;
 	char *p;
 	char name[MAX_NAME_LEN] = {0};
 
 	enum path_flag {
-		P_FLG_NOP = 0,
+		P_FLG_NOP,
 		P_FLG_SEP,  // seperator '/'
-		P_FLG_SPC,  // blank space
-		P_FLG_OTH,  // other character
+		P_FLG_VAL,  // valid character
 	};
 
 	p = path;
-	j = 0;
+	j = 0, k = 0;
 	flag = P_FLG_NOP;
 	for (i = 0; path[i] != '\0'; i++) {
 		switch (path[i]) {
 		case '/':
-			if (P_FLG_OTH == flag) {
-				strncpy(p, name, j);
-				p += j;
+			if (P_FLG_VAL == flag) {
+				strncpy(p, name, k);
+				p += k;
 			}
 			j = 0;
+			name[j++] = path[i];
 			flag = P_FLG_SEP;
 			break;
 		case ' ':
-			if (P_FLG_SEP == flag) {
-				flag = P_FLG_SPC;
+			if (P_FLG_VAL == flag) {
+				name[j++] = path[i];
 			}
 			break;
 		default:
-			flag = P_FLG_OTH;
+			name[j++] = path[i];
+			k = j;
+			flag = P_FLG_VAL;
 			break;
 		}
-		name[j++] = path[i];
 	}
-	if (P_FLG_OTH == flag) {
-		strncpy(p, name, j);
-		p += j;
+	if (P_FLG_VAL == flag) {
+		strncpy(p, name, k);
+		p += k;
 	}
 	*p = '\0';
 
@@ -59,7 +60,7 @@ static int __fs_path_strip(char *path)
 
 int main(int argc, char *argv[])
 {
-	char path[] = "   /home/peter/   ///hello world/path //  //world   ";
+	char path[] = "   /home/peter/   ///hello world/   path   //  //world   //  ";
 	printf("org-path: %s\n", path);
 	__fs_path_strip(path);
 	printf("reg-path: %s\n", path);
