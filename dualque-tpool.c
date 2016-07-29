@@ -10,7 +10,7 @@
 #include "list.h"
 
 #define MAX_PTHREADS_NUM            300
-#define ARG_BUF_LEN                 2
+#define ARG_BUF_LEN                 16
 
 typedef int (*dealer_exec_t)(void *);
 typedef struct {
